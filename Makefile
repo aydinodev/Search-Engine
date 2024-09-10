@@ -7,56 +7,49 @@
 # interested in reusing these course materials should contact the
 # author.
 
+# define the commands we will use for compilation and library building
 AR = ar
 ARFLAGS = rcs
 CC = gcc
 CXX = g++
-CFLAGS = -g -Wall -Wpedantic -std=c++17 -I. -I..
-LDFLAGS = -L. -L./libhw2 -lhw2 -L./libhw1 -lhw1
-CPPUNITFLAGS = -L../gtest -lgtest -lpthread
-HEADERS = DocIDTableReader.h \
-          DocTableReader.h \
-          FileIndexReader.h \
-          HashTableReader.h \
-          IndexTableReader.h \
-          LayoutStructs.h \
-          QueryProcessor.h \
-          Utils.h \
-          WriteIndex.h
 
-TESTOBJS = test_suite.o test_utils.o test_writeindex.o \
-           test_fileindexreader.o test_hashtablereader.o \
-           test_doctablereader.o test_indextablereader.o \
-           test_docidtablereader.o test_queryprocessor.o
+# define useful flags to cc/ld/etc.
+CFLAGS = -g -Wall -Wpedantic -I. -I./libhw1 -I./libhw2 -I./libhw3 -I.. -O0 -std=c++17
+LDFLAGS = -L. -L./libhw1 -L./libhw2 -L./libhw3 -lhw4 -lhw3 -lhw2 -lhw1 -lpthread
+CPPUNITFLAGS = -L../gtest -lgtest
 
-OBJS = DocIDTableReader.o DocTableReader.o FileIndexReader.o \
-       HashTableReader.o IndexTableReader.o QueryProcessor.o \
-       Utils.o WriteIndex.o 
+# define common dependencies
+OBJS_COMMON = ThreadPool.o ServerSocket.o HttpServer.o HttpConnection.o FileReader.o
+OBJS_GOOD = $(OBJS_COMMON) HttpUtils.o
 
-all: buildfileindex filesearchshell test_suite libhw3.a
+HEADERS = HttpConnection.h \
+	  HttpServer.h \
+	  ServerSocket.h \
+	  ThreadPool.h \
+	  HttpUtils.h \
+	  HttpRequest.h HttpResponse.h \
+	  FileReader.h
 
-filesearchshell: filesearchshell.o libhw3.a $(HEADERS)
-	$(CXX) $(CFLAGS) -o filesearchshell filesearchshell.o \
-	-L. -lhw3 $(LDFLAGS)
+TESTOBJS = test_serversocket.o test_threadpool.o test_filereader.o \
+	   test_httpconnection.o test_httputils.o test_suite.o
 
-buildfileindex: buildfileindex.o libhw3.a $(HEADERS)
-	$(CXX) $(CFLAGS) -o buildfileindex buildfileindex.o \
-	-L. -lhw3 $(LDFLAGS)
+all: http333d test_suite
 
-libhw3.a: $(OBJS) $(HEADERS)
-	$(AR) $(ARFLAGS) libhw3.a $(OBJS)
+http333d: http333d.o libhw4.a $(HEADERS)
+	$(CXX) $(CFLAGS) -o $@ http333d.o libhw4.a $(LDFLAGS)
 
-test_suite: $(TESTOBJS) $(OBJS) $(HEADERS) HW3FSCK
-	$(CXX) $(CFLAGS) -o test_suite $(OBJS) $(TESTOBJS) \
-	-L./hw3fsck -l:hw3fsck.a $(CPPUNITFLAGS) $(LDFLAGS)
+libhw4.a: $(OBJS_GOOD) $(HEADERS)
+	$(AR) $(ARFLAGS) $@ $(OBJS_GOOD)
+
+test_suite: $(TESTOBJS) libhw4.a $(HEADERS)
+	$(CXX) $(CFLAGS) -o $@ $(TESTOBJS) \
+	$(CPPUNITFLAGS) $(LDFLAGS) -lpthread
 
 %.o: %.cc $(HEADERS)
 	$(CXX) $(CFLAGS) -c $<
 
-HW3FSCK:
-	make -C ./hw3fsck
+%.o: %.c $(HEADERS)
+	$(CC) $(CFLAGS) -c -std=c17 $<
 
 clean:
-	/bin/rm -f *.o *~ test_suite libhw3.a buildfileindex \
-        filesearchshell
-	make -C ./hw3fsck clean
+	/bin/rm -f *.o *~ test_suite http333d libhw4.a

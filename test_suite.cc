@@ -18,39 +18,40 @@ using std::cout;
 using std::endl;
 
 // static
-int HW3Environment::total_points_ = 0;
-int HW3Environment::curr_test_points_ = 0;
+int HW4Environment::total_points_ = 0;
+int HW4Environment::curr_test_points_ = 0;
 
 // static
-void HW3Environment::AddPoints(int points) {
+void HW4Environment::AddPoints(int points) {
   total_points_ += points;
   curr_test_points_ += points;
   ::testing::Test::RecordProperty("points", curr_test_points_);
-  cout << " (" << total_points_ << "/" << HW3_MAXPOINTS << ")"<< endl;
+  cout << " (" << total_points_ << "/" << HW4_MAXPOINTS << ")"<< endl;
 }
 
-void HW3Environment::SetUp() {
-  cout << "HW3: there are " << HW3_MAXPOINTS;
+void HW4Environment::SetUp() {
+  cout << "HW4: there are " << HW4_MAXPOINTS;
   cout << " points available." << endl;
 }
 
-void HW3Environment::TearDown() {
+void HW4Environment::TearDown() {
   // Code here is run once for the entire test environment.
   cout << endl;
   cout << "You earned " << total_points_ << " out of ";
-  cout << HW3_MAXPOINTS << " points available (";
-  cout << ((100.0 * total_points_) / HW3_MAXPOINTS) << "%)" << endl;
+  cout << HW4_MAXPOINTS << " points available (";
+  cout << ((100.0 * total_points_) / HW4_MAXPOINTS) << "%)" << endl;
   cout << endl;
 }
 
-void HW3Environment::OpenTestCase() {
+void HW4Environment::OpenTestCase() {
   // Should be called at the beginning of each test case
   curr_test_points_ = 0;
   ::testing::Test::RecordProperty("points", curr_test_points_);
 }
 
-int main(int argc, char** argv) {
+
+int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
-  ::testing::AddGlobalTestEnvironment(new HW3Environment);
+  ::testing::AddGlobalTestEnvironment(new HW4Environment);
   return RUN_ALL_TESTS();
 }

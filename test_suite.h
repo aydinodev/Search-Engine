@@ -9,12 +9,12 @@
  * author.
  */
 
-#ifndef HW3_TEST_SUITE_H_
-#define HW3_TEST_SUITE_H_
+#ifndef HW4_TEST_SUITE_H_
+#define HW4_TEST_SUITE_H_
 
 #include "gtest/gtest.h"
 
-class HW3Environment : public ::testing::Environment {
+class HW4Environment : public ::testing::Environment {
  public:
   static void AddPoints(int points);
   static void OpenTestCase();
@@ -24,10 +24,10 @@ class HW3Environment : public ::testing::Environment {
   virtual void TearDown();
 
  private:
-  static constexpr int HW3_MAXPOINTS = 290;
+  static constexpr int HW4_MAXPOINTS = 250;
   static int total_points_;
   static int curr_test_points_;
 };
 
 
-#endif  // HW3_TEST_SUITE_H_
+#endif  // HW4_TEST_SUITE_H_
